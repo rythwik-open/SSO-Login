@@ -2,8 +2,63 @@
 <html>
 <head>
   <title>Google SSO Callback</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      padding: 50px;
+    }
+
+    #nameModal {
+      display: none;
+      position: fixed;
+      top: 30%;
+      left: 50%;
+      transform: translate(-50%, -30%);
+      background: white;
+      padding: 30px;
+      border: 1px solid #ccc;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      z-index: 1000;
+    }
+
+    #overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.4);
+      z-index: 999;
+    }
+
+    input[type="text"] {
+      padding: 10px;
+      width: 80%;
+      margin: 10px 0;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h2>Signing you in...</h2>
+
+  <div id="overlay"></div>
+
+  <div id="nameModal">
+    <h3>Confirm or Edit Your Name</h3>
+    <form id="nameForm">
+      <input type="text" id="finalName" required />
+      <br />
+      <button type="submit">Continue</button>
+    </form>
+  </div>
+
   <script>
-    // Function to decode JWT
     function decodeJWT(token) {
       const payload = token.split('.')[1];
       return JSON.parse(atob(payload));
@@ -23,40 +78,38 @@
       const email = decoded.email;
       const fetchedName = decoded.name;
 
-      // 👇 Prompt the user to confirm or edit the name
-      const finalName = prompt("Please confirm or edit your full name:", fetchedName);
+      // Show modal and prefill name
+      document.getElementById("finalName").value = fetchedName;
+      document.getElementById("nameModal").style.display = "block";
+      document.getElementById("overlay").style.display = "block";
 
-      if (!finalName) {
-        alert("You must enter a name to continue.");
-        return;
-      }
+      document.getElementById("nameForm").onsubmit = async function (e) {
+        e.preventDefault();
+        const finalName = document.getElementById("finalName").value;
 
-      // 👇 Log or send to API (right now just console log for testing)
-      const userData = {
-        userId,
-        email,
-        fetchedName,
-        finalName
+        const userData = {
+          userId,
+          email,
+          fetchedName,
+          finalName
+        };
+
+        console.log("User data to save:", userData);
+
+        // Uncomment this when backend is ready
+        // const res = await fetch("https://YOUR_API_URL/create-user", {
+        //   method: "POST",
+        //   headers: { "Content-Type": "application/json" },
+        //   body: JSON.stringify(userData)
+        // });
+
+        // if (res.ok) {
+        //   window.location.href = "/dashboard.html";
+        // } else {
+        //   alert("Error saving user to DB");
+        // }
       };
-
-      console.log("User data to save:", userData);
-
-      // Replace with actual fetch when ready
-      // const res = await fetch("https://YOUR_API_URL/create-user", {
-      //   method: "POST",
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify(userData)
-      // });
-
-      // if (res.ok) {
-      //   window.location.href = "/dashboard.html";
-      // } else {
-      //   alert("Error saving user to DB");
-      // }
     };
   </script>
-</head>
-<body>
-  <h2>Signing you in...</h2>
 </body>
 </html>
