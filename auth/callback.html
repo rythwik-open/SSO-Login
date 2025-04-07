@@ -1,52 +1,62 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>SSO Callback</title>
-</head>
-<body>
-  <h1>Logging you in...</h1>
+  <title>Google SSO Callback</title>
   <script>
-    async function handleCredentialResponse() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const credential = urlParams.get("credential");
+    // Function to decode JWT
+    function decodeJWT(token) {
+      const payload = token.split('.')[1];
+      return JSON.parse(atob(payload));
+    }
+
+    window.onload = async function () {
+      const params = new URLSearchParams(window.location.search);
+      const credential = params.get("credential");
 
       if (!credential) {
-        alert("No credential found in URL.");
+        document.body.innerHTML = "<h2>No token found.</h2>";
         return;
       }
 
-      // Decode JWT payload
-      const payload = JSON.parse(atob(credential.split('.')[1]));
-      const userId = payload.sub;
-      const email = payload.email;
-      const fetchedName = payload.name;
+      const decoded = decodeJWT(credential);
+      const userId = decoded.sub;
+      const email = decoded.email;
+      const fetchedName = decoded.name;
 
-      // Ask user to confirm/edit name
-      const finalName = prompt("Please confirm your name:", fetchedName) || fetchedName;
+      // 👇 Prompt the user to confirm or edit the name
+      const finalName = prompt("Please confirm or edit your full name:", fetchedName);
 
-      // Send data to backend
-      const res = await fetch("https://YOUR_API_GATEWAY_URL/create-user", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          userId,
-          email,
-          fetchedName,
-          finalName
-        })
-      });
-
-      if (res.ok) {
-        // Success - redirect to dashboard
-        window.location.href = "/dashboard.html";
-      } else {
-        alert("Error saving user to DB.");
+      if (!finalName) {
+        alert("You must enter a name to continue.");
+        return;
       }
-    }
 
-    handleCredentialResponse();
+      // 👇 Log or send to API (right now just console log for testing)
+      const userData = {
+        userId,
+        email,
+        fetchedName,
+        finalName
+      };
+
+      console.log("User data to save:", userData);
+
+      // Replace with actual fetch when ready
+      // const res = await fetch("https://YOUR_API_URL/create-user", {
+      //   method: "POST",
+      //   headers: { "Content-Type": "application/json" },
+      //   body: JSON.stringify(userData)
+      // });
+
+      // if (res.ok) {
+      //   window.location.href = "/dashboard.html";
+      // } else {
+      //   alert("Error saving user to DB");
+      // }
+    };
   </script>
+</head>
+<body>
+  <h2>Signing you in...</h2>
 </body>
 </html>
