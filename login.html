@@ -58,9 +58,6 @@
     <button class="w-full mt-4 border border-gray-300 text-gray-700 py-2 rounded-md hover:bg-gray-100">
       Sign in with X (Coming Soon)
     </button>
-
-    <!-- Output for Debug -->
-    <pre id="output" class="mt-6 bg-gray-100 p-4 rounded text-sm text-left whitespace-pre-wrap">Waiting for login...</pre>
   </div>
 
   <script>
@@ -75,9 +72,6 @@
 
     function handleCredentialResponse(response) {
       const userData = parseJwt(response.credential);
-      document.getElementById('output').textContent = JSON.stringify(userData, null, 2);
-
-      // Save to localStorage and redirect
       localStorage.setItem('userData', JSON.stringify(userData));
       window.location.href = "profile-setup.html";
     }
