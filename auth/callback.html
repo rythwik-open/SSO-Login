@@ -1,27 +1,52 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Login Callback</title>
+  <title>SSO Callback</title>
 </head>
 <body>
-  <h1>Handling Google Login...</h1>
+  <h1>Logging you in...</h1>
   <script>
-    window.onload = () => {
-      const urlParams = new URLSearchParams(window.location.hash.substr(1));
-      const idToken = urlParams.get('id_token');
-      if (idToken) {
-        // Decode the JWT token (basic decode to get name/email)
-        const payload = JSON.parse(atob(idToken.split('.')[1]));
-        document.body.innerHTML = `
-          <h2>Welcome, ${payload.name}!</h2>
-          <p>Email: ${payload.email}</p>
-          <p>ID: ${payload.sub}</p>
-        `;
-        // Later: Save to your backend here
+    async function handleCredentialResponse() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const credential = urlParams.get("credential");
+
+      if (!credential) {
+        alert("No credential found in URL.");
+        return;
+      }
+
+      // Decode JWT payload
+      const payload = JSON.parse(atob(credential.split('.')[1]));
+      const userId = payload.sub;
+      const email = payload.email;
+      const fetchedName = payload.name;
+
+      // Ask user to confirm/edit name
+      const finalName = prompt("Please confirm your name:", fetchedName) || fetchedName;
+
+      // Send data to backend
+      const res = await fetch("https://YOUR_API_GATEWAY_URL/create-user", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          userId,
+          email,
+          fetchedName,
+          finalName
+        })
+      });
+
+      if (res.ok) {
+        // Success - redirect to dashboard
+        window.location.href = "/dashboard.html";
       } else {
-        document.body.innerHTML = '<p>Login failed or token missing.</p>';
+        alert("Error saving user to DB.");
       }
     }
+
+    handleCredentialResponse();
   </script>
 </body>
 </html>
