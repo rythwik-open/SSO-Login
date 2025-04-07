@@ -2,7 +2,8 @@
 <html>
   <head>
     <title>Google Login</title>
-    <meta name="google-signin-client_id" content="YOUR_GOOGLE_CLIENT_ID">
+    <meta charset="UTF-8" />
+    <meta name="google-signin-client_id" content="844210174343-s150lukvio0clbgt7hh2tbkvsti6r4qj.apps.googleusercontent.com">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
       body {
@@ -14,6 +15,8 @@
   </head>
   <body>
     <h1>Login with Google</h1>
+
+    <!-- Google Identity Services Configuration -->
     <div id="g_id_onload"
          data-client_id="844210174343-s150lukvio0clbgt7hh2tbkvsti6r4qj.apps.googleusercontent.com"
          data-context="signin"
@@ -22,6 +25,7 @@
          data-auto_prompt="false">
     </div>
 
+    <!-- Google Sign-In Button -->
     <div class="g_id_signin"
          data-type="standard"
          data-size="large"
