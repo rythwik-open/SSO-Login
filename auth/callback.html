@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login Callback</title>
+</head>
+<body>
+  <h1>Handling Google Login...</h1>
+  <script>
+    window.onload = () => {
+      const urlParams = new URLSearchParams(window.location.hash.substr(1));
+      const idToken = urlParams.get('id_token');
+      if (idToken) {
+        // Decode the JWT token (basic decode to get name/email)
+        const payload = JSON.parse(atob(idToken.split('.')[1]));
+        document.body.innerHTML = `
+          <h2>Welcome, ${payload.name}!</h2>
+          <p>Email: ${payload.email}</p>
+          <p>ID: ${payload.sub}</p>
+        `;
+        // Later: Save to your backend here
+      } else {
+        document.body.innerHTML = '<p>Login failed or token missing.</p>';
+      }
+    }
+  </script>
+</body>
+</html>
