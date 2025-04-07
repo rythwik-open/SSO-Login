@@ -1,48 +1,25 @@
-<!-- login.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Login Page</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Google Identity Services -->
-  <meta name="google-signin-client_id" content="844210174343-s150lukvio0clbgt7hh2tbkvsti6r4qj.apps.googleusercontent.com">
+  <meta name="google-signin-client_id" content="YOUR_GOOGLE_CLIENT_ID_HERE">
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body class="bg-gray-100 min-h-screen flex items-center justify-center">
   <div class="bg-white p-8 rounded-xl shadow-md w-full max-w-md">
     <h2 class="text-2xl font-bold mb-6 text-center">Sign in to Your Account</h2>
 
-    <!-- Email/Password Login (UI only) -->
-    <form class="space-y-4">
-      <div>
-        <label class="block text-sm font-medium text-gray-700">Email</label>
-        <input type="email" class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md" placeholder="you@example.com">
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-gray-700">Password</label>
-        <input type="password" class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md" placeholder="••••••••">
-      </div>
-      <div class="flex justify-between items-center text-sm">
-        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">Login</button>
-        <a href="#" class="text-blue-600 hover:underline">Forgot password?</a>
-      </div>
-    </form>
-
-    <div class="my-6 text-center text-gray-400">or</div>
-
-    <!-- Google SSO -->
+    <!-- Google Sign-In -->
     <div id="g_id_onload"
-         data-client_id="844210174343-s150lukvio0clbgt7hh2tbkvsti6r4qj.apps.googleusercontent.com"
+         data-client_id="YOUR_GOOGLE_CLIENT_ID_HERE"
          data-context="signin"
          data-ux_mode="popup"
          data-auto_prompt="false"
-         data-auto_select="false"
-         data-callback="handleCredentialResponse">
+         data-callback="handleCredentialResponse"
+         data-auto_select="false">
     </div>
 
     <div class="g_id_signin"
@@ -53,11 +30,6 @@
          data-shape="rectangular"
          data-logo_alignment="left">
     </div>
-
-    <!-- X SSO Placeholder -->
-    <button class="w-full mt-4 border border-gray-300 text-gray-700 py-2 rounded-md hover:bg-gray-100">
-      Sign in with X (Coming Soon)
-    </button>
   </div>
 
   <script>
@@ -70,10 +42,28 @@
       return JSON.parse(jsonPayload);
     }
 
-    function handleCredentialResponse(response) {
+    async function handleCredentialResponse(response) {
       const userData = parseJwt(response.credential);
       localStorage.setItem('userData', JSON.stringify(userData));
-      window.location.href = "profile-setup.html";
+
+      const userId = userData.sub;
+
+      // Check if user exists in DB
+      try {
+        const res = await fetch(`/api/get-user?userId=${userId}`);
+        const user = await res.json();
+
+        if (user && user.name && user.username) {
+          // Already set up
+          window.location.href = "dashboard.html";
+        } else {
+          // Needs profile setup
+          window.location.href = "profile-setup.html";
+        }
+      } catch (err) {
+        console.error("Error checking user:", err);
+        window.location.href = "profile-setup.html";
+      }
     }
   </script>
 </body>

@@ -1,20 +1,12 @@
-<!-- profile-setup.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Profile Setup</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 min-h-screen flex items-center justify-center">
-  <div class="text-center">
-    <h2 class="text-xl font-semibold mb-4">Welcome! Please complete your profile.</h2>
-  </div>
-
-  <!-- Modal -->
   <div id="modal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
     <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
       <h3 class="text-xl font-semibold mb-4">Set up your profile</h3>
@@ -36,15 +28,11 @@
   </div>
 
   <script>
-    const userData = JSON.parse(localStorage.getItem('userData'));
-
+    const userData = JSON.parse(localStorage.getItem("userData"));
     if (!userData) {
-      // Fallback if userData is missing (redirect or error)
-      alert("No login data found. Redirecting...");
       window.location.href = "login.html";
     }
 
-    // Pre-fill name field
     document.getElementById("nameInput").value = userData.name || "";
 
     document.getElementById("profileForm").addEventListener("submit", async function (e) {
@@ -52,25 +40,24 @@
       const name = document.getElementById("nameInput").value.trim();
       const username = document.getElementById("usernameInput").value.trim();
 
-      // Example POST call (replace URL with your backend endpoint)
-      /*
-      await fetch("/api/save-profile", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userId: userData.sub,
-          name,
-          username
-        })
-      });
-      */
+      const payload = {
+        userId: userData.sub,
+        name,
+        username
+      };
 
-      // For now, just log and close modal
-      console.log("Saved:", { name, username });
+      try {
+        await fetch("/api/save-profile", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
 
-      localStorage.removeItem("userData");
-      alert("Profile saved!");
-      window.location.href = "dashboard.html"; // or wherever you want
+        localStorage.removeItem("userData");
+        window.location.href = "dashboard.html";
+      } catch (err) {
+        alert("Something went wrong saving your profile.");
+      }
     });
   </script>
 </body>

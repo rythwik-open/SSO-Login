@@ -13,14 +13,30 @@
   </div>
 
   <script>
-    const userData = JSON.parse(localStorage.getItem("userData"));
-    const greetingEl = document.getElementById("greeting");
+    async function loadUser() {
+      const userData = JSON.parse(localStorage.getItem("userData"));
+      const greetingEl = document.getElementById("greeting");
 
-    if (userData && userData.given_name) {
-      greetingEl.textContent = `Hi, ${userData.given_name}!`;
-    } else {
-      greetingEl.textContent = "Hi there!";
+      if (!userData) {
+        greetingEl.textContent = "Please login again.";
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/get-user?userId=${userData.sub}`);
+        const user = await res.json();
+
+        if (user && user.name) {
+          greetingEl.textContent = `Hi, ${user.name}!`;
+        } else {
+          greetingEl.textContent = `Hi there!`;
+        }
+      } catch (err) {
+        greetingEl.textContent = "Error loading your data.";
+      }
     }
+
+    loadUser();
   </script>
 </body>
 </html>
